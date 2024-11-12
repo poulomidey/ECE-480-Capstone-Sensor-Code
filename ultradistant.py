@@ -11,12 +11,13 @@
 import RPi.GPIO as GPIO
 import time
 import threading
-from sensor import Sensor
+import os
+# from sensor import Sensor
 # board numbering system to use
 
-class Ultrasonic(Sensor):
+class Ultrasonic():
     def __init__(self):
-        super().__init__()
+        # super().__init__()
         #GPIO.setmode(GPIO.BCM)
 #         GPIO.setmode(GPIO.BOARD)
 
@@ -29,10 +30,12 @@ class Ultrasonic(Sensor):
 #         GPIO.setup(self.trigPin, GPIO.OUT)
 #         GPIO.setup(self.echoPin, GPIO.IN)
 
-        # self.is_running = False
-        # self.my_thread = None
+        self.is_running = False
+        self.my_thread = None
         # self.file = open('data/ultrasonic_distance.txt', 'a')
-        self.file = open(self.file_path + 'ultrasonic_distance.txt', 'a')
+        file_path = 'data/' + time.strftime("%Y%m%d-%H%M") + '/'
+        os.makedirs(file_path, exist_ok=True)
+        self.file = open(file_path + 'ultrasonic_distance.txt', 'a')
 
         # # ask user for number of replicate distances and short description of run
         # numReadings = int(input('Enter number of distance readings desired: '))
@@ -90,21 +93,21 @@ class Ultrasonic(Sensor):
         GPIO.cleanup()
 
 
-#     def start_data_collection(self):
-# #         print('in start data collection')
-#         self.my_thread = threading.Thread(target=self._collect_data)
-# #         self.my_thread.do_run = True
-#         self.is_running = True
-#         # self.distance()
-#         self.my_thread.start()
+    def start_data_collection(self):
+#         print('in start data collection')
+        self.my_thread = threading.Thread(target=self._collect_data)
+#         self.my_thread.do_run = True
+        self.is_running = True
+        # self.distance()
+        self.my_thread.start()
 
 
-#     def stop_data_collection(self):
-#         # self.is_running = False
-#         if self.my_thread is not None:
-# #             self.my_thread.do_run = False
-#             self.is_running = False
-#             self.my_thread.join()
+    def stop_data_collection(self):
+        # self.is_running = False
+        if self.my_thread is not None:
+#             self.my_thread.do_run = False
+            self.is_running = False
+            self.my_thread.join()
         
 
 # testing wo button

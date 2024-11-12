@@ -11,17 +11,19 @@ import argparse
 import time
 import io
 import os.path # included to save photos to a different folder for each hour
-from sensor import Sensor
+# from sensor import Sensor
+import os
+import threading
 
 #TODO: GET RID OF CODE WHERE IT DISPLAYS AND LAUNCHES WINDOW, JUST KEEP RECORDING
-class ThermalCamera(Sensor):
+class ThermalCamera():
 	def __init__(self):
-		dev = 1 # removing argument "--device x" which allows to specify device, don't move the thermal camera location!
+# 		dev = 1 # removing argument "--device x" which allows to specify device, don't move the thermal camera location!
 		
 		#init video
-		self.cap = cv2.VideoCapture('/dev/video'+str(dev), cv2.CAP_V4L)
-
-		self.cap.set(cv2.CAP_PROP_CONVERT_RGB, 0.0)
+# 		self.cap = cv2.VideoCapture('/dev/video'+str(dev), cv2.CAP_V4L)
+# 
+# 		self.cap.set(cv2.CAP_PROP_CONVERT_RGB, 0.0)
 
 		#256x192 General settings
 		self.width = 256 #Sensor width
@@ -38,16 +40,22 @@ class ThermalCamera(Sensor):
 		self.rad = 0 #blur radius
 		self.threshold = 2
 		self.hud = True
-		# recording = True # changed to start automatically?
+		self.recording = True # changed to start automatically?
 		self.elapsed = "00:00:00"
 		self.snaptime = "None"
 		self.start = time.time()
 		self.now = time.strftime("%Y%m%d--%H%M%S")
-		self.videoOut = cv2.VideoWriter('data/thermaldata'+self.now+'output.avi', cv2.VideoWriter_fourcc(*'XVID'),25, (self.newWidth,self.newHeight))
+		
+		self.file_path = 'data/' + time.strftime("%Y%m%d-%H%M") + '/'
+		os.makedirs(self.file_path, exist_ok=True)
+		self.videoOut = cv2.VideoWriter(self.file_path+'thermal_video'+self.now+'output.avi', cv2.VideoWriter_fourcc(*'XVID'),25, (self.newWidth,self.newHeight))
 		# creating a file to write temperature data to and timestamp, eventually gps data too....
 
-		self.file = open('data/thermaldata'+str(time.gmtime()[1])+"-"+str(time.gmtime()[2])+"-"+str(time.gmtime()[0])+"  "+str(time.gmtime()[3]-5)+"."+str(time.gmtime()[4])+"."+str(time.gmtime()[5])+'.txt', 'a')
-		
+
+		self.is_running = False
+		self.my_thread = None
+
+
 	def _snapshot(self, heatmap):
 		self.now = time.strftime("%Y%m%d-%H%M%S") 
 		self.snaptime = time.strftime("%H:%M:%S")
@@ -55,11 +63,10 @@ class ThermalCamera(Sensor):
 		
 		# right now this is requiring sudo to create a directory...
 # 		fileDir="/media/pi/126 GB Volume/ECE480/ThermalCam/src/"
-		fileDir = "data/thermalcamera_summary"
+		fileDir = self.file_path + "thermalcamera_summary/"
 # 		fileDir=fileDir+last
 		fileDir=fileDir+last
-		if not os.path.exists(fileDir):
-			os.makedirs(fileDir)
+		os.makedirs(fileDir, exist_ok=True)
 		name= str(os.path.join(fileDir, self.now+".png"))
 		# file1=open(name,'wb')
 		#file1.write(heatmap)
@@ -67,9 +74,14 @@ class ThermalCamera(Sensor):
 		return self.snaptime
 	
 	def _collect_data(self):
-		while(self.cap.isOpened() and self.is_running):
+		dev = 1 # removing argument "--device x" which allows to specify device, don't move the thermal camera location!
+		cap = cv2.VideoCapture('/dev/video'+str(dev), cv2.CAP_V4L)
+		cap.set(cv2.CAP_PROP_CONVERT_RGB, 0.0)
+# 		print(cap.isOpened())
+# 		print(self.is_running)
+		while(self.is_running and cap.isOpened()):
 			# Capture frame-by-frame
-			ret, frame = self.cap.read()
+			ret, frame = cap.read()
 			if ret == True:
 				imdata,thdata = np.array_split(frame, 2)
 				hi = thdata[96][128][0]
@@ -231,12 +243,28 @@ class ThermalCamera(Sensor):
 				self.elapsed = time.strftime("%H:%M:%S", time.gmtime(self.elapsed)) 
 				#print(self.elapsed)
 				self.videoOut.write(heatmap)
-				self.file.write("Time: "+ str(time.gmtime()[1])+"-"+str(time.gmtime()[2])+"-"+str(time.gmtime()[0])+"  "+str(time.gmtime()[3]-5)+":"+str(time.gmtime()[4])+":"+str(time.gmtime()[5])+"\n")
-				self.file.write("Max Temp: "+ str(maxtemp)+"\n")
-				self.file.write("Min Temp: "+ str(mintemp)+"\n")
-				self.file.write("Average Temp:"+ str(avgtemp)+"\n")
-				self.file.write("Location: "+"\n\n")
+# 				self.file.write("Time: "+ str(time.gmtime()[1])+"-"+str(time.gmtime()[2])+"-"+str(time.gmtime()[0])+"  "+str(time.gmtime()[3]-5)+":"+str(time.gmtime()[4])+":"+str(time.gmtime()[5])+"\n")
+# 				self.file.write("Max Temp: "+ str(maxtemp)+"\n")
+# 				self.file.write("Min Temp: "+ str(mintemp)+"\n")
+# 				self.file.write("Average Temp:"+ str(avgtemp)+"\n")
+# 				self.file.write("Location: "+"\n\n")
 				self._snapshot(heatmap)
+				
+				if not self.is_running:
+					capture.release()
+					self.recording == False
+					break
+                    
+		print('out of loop')
+	def start_data_collection(self):
+		self.is_running = True
+		self.my_thread = threading.Thread(target=self._collect_data())
+		self.my_thread.start()
+    
+	def stop_data_collection(self):
+		if self.my_thread is not None:
+			self.is_running = False
+			self.my_thread.join()
 
 
 # testing wo button
@@ -245,3 +273,4 @@ if __name__ == "__main__":
     tc.start_data_collection()
     time.sleep(3)
     tc.stop_data_collection()
+    print('stop')

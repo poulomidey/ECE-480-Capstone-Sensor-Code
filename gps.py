@@ -6,9 +6,10 @@ import serial               #import serial pacakge
 import time
 import sys                  #import system package
 import threading
-from sensor import Sensor
+# from sensor import Sensor
+import os
 
-class GPS(Sensor):
+class GPS():
     def __init__(self):
         self.gpgga_info = "$GPGGA,"
         self.ser = serial.Serial ("/dev/ttyS0")              #Open port with baud rate
@@ -17,11 +18,12 @@ class GPS(Sensor):
         self.lat_in_degrees = 0
         self.long_in_degrees = 0
 
-        # self.is_running = False
-        # self.my_thread = None
+        self.is_running = False
+        self.my_thread = None
         # self.file = open('data/locations1108.txt', 'a')
-        self.file += 'gps_data.txt'
-        self.file = open(self.file, 'a')
+        file_path = 'data/' + time.strftime("%Y%m%d-%H%M") + '/'
+        os.makedirs(file_path, exist_ok=True)
+        self.file = open(file_path + 'gps_data.txt', 'a')
 
     def _GPS_Info(self):
         # global NMEA_buff
@@ -38,8 +40,11 @@ class GPS(Sensor):
         print ("NMEA Latitude:", nmea_latitude,"NMEA Longitude:", nmea_longitude,'\n')
         print("NMEA Time: ", time, file = self.file)
         
-        lat = float(nmea_latitude)                  #convert string into float for calculation
-        longi = float(nmea_longitude)               #convertr string into float for calculation
+        if nmea_latitude != '':
+            lat = float(nmea_latitude)                  #convert string into float for calculation
+            longi = float(nmea_longitude)               #convertr string into float for calculation
+        else:
+            raise Exception('no gps signal')
         
         self.lat_in_degrees = self._convert_to_degrees(lat)    #get latitude in degree decimal format
         self.long_in_degrees = self._convert_to_degrees(longi) #get longitude in degree decimal format
@@ -65,20 +70,20 @@ class GPS(Sensor):
                 print("lat in degrees:", self.lat_in_degrees," long in degree: ", self.long_in_degrees, '\n')
                 # time is off by three hours
                 #nmea_time_new=nmea_time-30000
-                print("Latitude: ", self.lat_in_degrees," Longitude: ", self.long_in_degrees, file = open('locations1108.txt', 'a'))
+                print("Latitude: ", self.lat_in_degrees," Longitude: ", self.long_in_degrees, file = self.file)
         #webbrowser.open(map_link)        #open current position information in google map
         self.file.close()
         sys.exit(0)
     
-    # def start_data_collection(self):
-    #     self.my_thread = threading.Thread(target=self._collect_data())
-    #     self.is_running = True
-    #     self.my_thread.start()
+    def start_data_collection(self):
+        self.is_running = True
+        self.my_thread = threading.Thread(target=self._collect_data())
+        self.my_thread.start()
     
-    # def stop_data_collection(self):
-    #     if self.my_thread is not None:
-    #         self.is_running = False
-    #         self.my_thread.join()
+    def stop_data_collection(self):
+        if self.my_thread is not None:
+            self.is_running = False
+            self.my_thread.join()
 
 # testing wo button
 if __name__ == "__main__":
