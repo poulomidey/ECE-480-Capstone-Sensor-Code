@@ -31,7 +31,8 @@ class Ultrasonic(Sensor):
 
         # self.is_running = False
         # self.my_thread = None
-        self.file = open('data/ultrasonic_distance.txt', 'a')
+        # self.file = open('data/ultrasonic_distance.txt', 'a')
+        self.file = open(self.file_path + 'ultrasonic_distance.txt', 'a')
 
         # # ask user for number of replicate distances and short description of run
         # numReadings = int(input('Enter number of distance readings desired: '))

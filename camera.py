@@ -6,7 +6,9 @@ class Camera(Sensor):
         self.camera = picamera.PiCamera()
         self.camera.resolution = (640, 480)
 
-        self.file = 'data/camera.h264'
+        # self.file = 'data/camera.h264'
+        self.file += 'camera_data.h264'
+        # self.file = open(self.file, 'a')
    
     def _collect_data(self):
         while self.is_running:

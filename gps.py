@@ -19,7 +19,9 @@ class GPS(Sensor):
 
         # self.is_running = False
         # self.my_thread = None
-        self.file = open('data/locations1108.txt', 'a')
+        # self.file = open('data/locations1108.txt', 'a')
+        self.file += 'gps_data.txt'
+        self.file = open(self.file, 'a')
 
     def _GPS_Info(self):
         # global NMEA_buff
