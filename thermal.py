@@ -43,18 +43,20 @@ class ThermalCamera(Sensor):
 		self.snaptime = "None"
 		self.start = time.time()
 		self.now = time.strftime("%Y%m%d--%H%M%S")
-		self.videoOut = cv2.VideoWriter(self.now+'output.avi', cv2.VideoWriter_fourcc(*'XVID'),25, (self.newWidth,self.newHeight))
+		self.videoOut = cv2.VideoWriter('data/thermaldata'+self.now+'output.avi', cv2.VideoWriter_fourcc(*'XVID'),25, (self.newWidth,self.newHeight))
 		# creating a file to write temperature data to and timestamp, eventually gps data too....
-		
-		self.file = open('data/thermaldata'+str(time.gmtime()[1])+"-"+str(time.gmtime()[2])+"-"+str(time.gmtime()[0])+"  "+str(time.gmtime()[3]-5)+"."+str(time.gmtime()[4])+"."+str(time.gmtime()[5])+'.txt', 'a')
 
+		self.file = open('data/thermaldata'+str(time.gmtime()[1])+"-"+str(time.gmtime()[2])+"-"+str(time.gmtime()[0])+"  "+str(time.gmtime()[3]-5)+"."+str(time.gmtime()[4])+"."+str(time.gmtime()[5])+'.txt', 'a')
+		
 	def _snapshot(self, heatmap):
 		self.now = time.strftime("%Y%m%d-%H%M%S") 
 		self.snaptime = time.strftime("%H:%M:%S")
 		last=str(time.gmtime()[1])+"-"+str(time.gmtime()[2])+"-"+str(time.gmtime()[0])+"hr"+str(time.gmtime()[3]-5)
 		
 		# right now this is requiring sudo to create a directory...
-		fileDir="/media/pi/126 GB Volume/ECE480/ThermalCam/src/"
+# 		fileDir="/media/pi/126 GB Volume/ECE480/ThermalCam/src/"
+		fileDir = "data/thermalcamera_summary"
+# 		fileDir=fileDir+last
 		fileDir=fileDir+last
 		if not os.path.exists(fileDir):
 			os.makedirs(fileDir)

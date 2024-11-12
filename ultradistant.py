@@ -16,6 +16,7 @@ from sensor import Sensor
 
 class Ultrasonic(Sensor):
     def __init__(self):
+        super().__init__()
         #GPIO.setmode(GPIO.BCM)
 #         GPIO.setmode(GPIO.BOARD)
 

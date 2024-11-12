@@ -15,9 +15,10 @@ state = False
 
 # initialize sensors
 us = Ultrasonic() # ultrasonic sensor
-gps = GPS() # GPS
-tc = ThermalCamera()
-sensors = [us, gps, tc]
+# gps = GPS() # GPS
+# tc = ThermalCamera()
+# sensors = [us, gps, tc]
+# sensors = [us]
 
 while True:
     GPIO.setmode(GPIO.BOARD)
@@ -33,16 +34,18 @@ while True:
 
             if state == True:
                 # call sensors
-                # us.start_data_collection()
+                us.start_data_collection()
+#                 tc.start_data_collection()
                 # gps.start_data_collection()
-                for sensor in sensors:
-                    sensor.start_data_collection()
+#                 for sensor in sensors:
+#                     sensor.start_data_collection()
             else:
                 # stop sensors
-                # us.stop_data_collection()
+                us.stop_data_collection()
+#                 tc.start_data_collection()
                 # gps.stop_data_collection()
-                for sensor in sensors:
-                    sensor.stop_data_collection()
+#                 for sensor in sensors:
+#                     sensor.stop_data_collection()
 
             # TODO: Make it so each button press creates a new subfolder within the data folder (ideally timestamped),
             # which will hold all the data from all the sensors for that button press
