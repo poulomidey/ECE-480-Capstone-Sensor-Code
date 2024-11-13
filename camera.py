@@ -29,7 +29,7 @@ class Camera():
 
     def start_data_collection(self):
         self.is_running = True
-        self.my_thread = threading.Thread(target=self._collect_data())
+        self.my_thread = threading.Thread(target=self._collect_data)
         self.my_thread.start()
     
     def stop_data_collection(self):
