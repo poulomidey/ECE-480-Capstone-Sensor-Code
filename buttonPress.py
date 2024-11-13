@@ -17,7 +17,7 @@ state = False
 # initialize sensors
 us = Ultrasonic() # ultrasonic sensor
 # gps = GPS() # GPS
-# tc = ThermalCamera()
+tc = ThermalCamera()
 cm = Camera()
 # sensors = [us, gps, tc]
 # sensors = [us]
@@ -38,8 +38,8 @@ while True:
                 # call sensors
                 us.start_data_collection()
                 cm.start_data_collection()
+                tc.start_data_collection()
                 print('start')
-#                 tc.start_data_collection()
 #                 gps.start_data_collection()
 #                 for sensor in sensors:
 #                     sensor.start_data_collection()
@@ -47,8 +47,8 @@ while True:
                 # stop sensors
                 us.stop_data_collection()
                 cm.stop_data_collection()
+                tc.stop_data_collection() #change
                 print('stop')
-#                 tc.start_data_collection()
 #                 gps.stop_data_collection()
 #                 for sensor in sensors:
 #                     sensor.stop_data_collection()

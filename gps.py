@@ -21,7 +21,7 @@ class GPS():
         self.is_running = False
         self.my_thread = None
         # self.file = open('data/locations1108.txt', 'a')
-        file_path = 'data/' + time.strftime("%Y%m%d-%H%M") + '/'
+        file_path = 'data/' + time.strftime("%Y%m%d-%H%M") + '/' #change
         os.makedirs(file_path, exist_ok=True)
         self.file = open(file_path + 'gps_data.txt', 'a')
 

@@ -77,7 +77,7 @@ class ThermalCamera():
 		dev = 1 # removing argument "--device x" which allows to specify device, don't move the thermal camera location!
 		cap = cv2.VideoCapture('/dev/video'+str(dev), cv2.CAP_V4L)
 		cap.set(cv2.CAP_PROP_CONVERT_RGB, 0.0)
-# 		print(cap.isOpened())
+# 		print(cap.isOpened())v
 # 		print(self.is_running)
 		while(self.is_running and cap.isOpened()):
 			# Capture frame-by-frame
@@ -236,13 +236,14 @@ class ThermalCamera():
 					cv2.FONT_HERSHEY_SIMPLEX, 0.45,(0, 255, 255), 1, cv2.LINE_AA)
 
 				#display image
-				cv2.imshow('Thermal',heatmap)
+				#cv2.imshow('Thermal',heatmap)
 
 				# if recording == True:
 				self.elapsed = (time.time() - self.start)
 				self.elapsed = time.strftime("%H:%M:%S", time.gmtime(self.elapsed)) 
 				#print(self.elapsed)
 				self.videoOut.write(heatmap)
+				print("video Out")
 # 				self.file.write("Time: "+ str(time.gmtime()[1])+"-"+str(time.gmtime()[2])+"-"+str(time.gmtime()[0])+"  "+str(time.gmtime()[3]-5)+":"+str(time.gmtime()[4])+":"+str(time.gmtime()[5])+"\n")
 # 				self.file.write("Max Temp: "+ str(maxtemp)+"\n")
 # 				self.file.write("Min Temp: "+ str(mintemp)+"\n")
@@ -251,10 +252,14 @@ class ThermalCamera():
 				self._snapshot(heatmap)
 				
 				if not self.is_running:
-					capture.release()
 					self.recording == False
+					cap.release()
+					self.videoOut.release()
+					print("closing funcs")
+					cv2.destroyAllWindows()
 					break
-                    
+			else:
+				break
 		print('out of loop')
 		
 	def start_data_collection(self):
@@ -272,6 +277,6 @@ class ThermalCamera():
 if __name__ == "__main__":
     tc = ThermalCamera()
     tc.start_data_collection()
-    time.sleep(3)
+    time.sleep(10)
     tc.stop_data_collection()
     print('stop')

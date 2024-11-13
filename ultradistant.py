@@ -33,7 +33,8 @@ class Ultrasonic():
         self.is_running = False
         self.my_thread = None
         # self.file = open('data/ultrasonic_distance.txt', 'a')
-        file_path = 'data/' + time.strftime("%Y%m%d-%H%M") + '/'
+        file_path = 'data/' + time.strftime("%Y%m%d-%H%M") + '/' #change
+        print(file_path)
         os.makedirs(file_path, exist_ok=True)
         self.file = open(file_path + 'ultrasonic_distance.txt', 'a')
 
@@ -89,7 +90,7 @@ class Ultrasonic():
             time.sleep(self.delayTime)
 #         finally:
 #         print("Here")
-        self.file.close()
+        self.file.close() #try
         GPIO.cleanup()
 
 
