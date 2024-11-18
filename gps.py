@@ -89,5 +89,5 @@ class GPS():
 if __name__ == "__main__":
     gps = GPS()
     gps.start_data_collection()
-    time.sleep(3)
+    time.sleep(20)
     gps.stop_data_collection()

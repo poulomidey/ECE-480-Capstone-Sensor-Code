@@ -5,6 +5,10 @@ from gps import GPS
 from thermal import ThermalCamera
 from camera import Camera
 
+file = open('testing.txt','a')
+file.write("Hi")
+
+
 #button setup
 GPIO.setwarnings(False)
 GPIO.setmode(GPIO.BOARD)
@@ -16,7 +20,7 @@ state = False
 
 # initialize sensors
 us = Ultrasonic() # ultrasonic sensor
-# gps = GPS() # GPS
+gps = GPS() # GPS
 tc = ThermalCamera()
 cm = Camera()
 # sensors = [us, gps, tc]
@@ -40,7 +44,7 @@ while True:
                 cm.start_data_collection()
                 tc.start_data_collection()
                 print('start')
-#                 gps.start_data_collection()
+                gps.start_data_collection()
 #                 for sensor in sensors:
 #                     sensor.start_data_collection()
             else:
@@ -49,7 +53,9 @@ while True:
                 cm.stop_data_collection()
                 tc.stop_data_collection() #change
                 print('stop')
-#                 gps.stop_data_collection()
+                file.write('bye')
+                file.close()
+                gps.stop_data_collection()
 #                 for sensor in sensors:
 #                     sensor.stop_data_collection()
 

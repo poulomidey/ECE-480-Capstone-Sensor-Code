@@ -15,6 +15,7 @@ import os.path # included to save photos to a different folder for each hour
 import os
 import threading
 
+		
 #TODO: GET RID OF CODE WHERE IT DISPLAYS AND LAUNCHES WINDOW, JUST KEEP RECORDING
 class ThermalCamera():
 	def __init__(self):
@@ -50,11 +51,10 @@ class ThermalCamera():
 		os.makedirs(self.file_path, exist_ok=True)
 		self.videoOut = cv2.VideoWriter(self.file_path+'thermal_video'+self.now+'output.avi', cv2.VideoWriter_fourcc(*'XVID'),25, (self.newWidth,self.newHeight))
 		# creating a file to write temperature data to and timestamp, eventually gps data too....
-
-
+		self.file =open('data/' + time.strftime("%Y%m%d-%H%M")+".txt","a")
 		self.is_running = False
 		self.my_thread = None
-
+        
 
 	def _snapshot(self, heatmap):
 		self.now = time.strftime("%Y%m%d-%H%M%S") 
@@ -244,14 +244,15 @@ class ThermalCamera():
 				#print(self.elapsed)
 				self.videoOut.write(heatmap)
 				print("video Out")
-# 				self.file.write("Time: "+ str(time.gmtime()[1])+"-"+str(time.gmtime()[2])+"-"+str(time.gmtime()[0])+"  "+str(time.gmtime()[3]-5)+":"+str(time.gmtime()[4])+":"+str(time.gmtime()[5])+"\n")
-# 				self.file.write("Max Temp: "+ str(maxtemp)+"\n")
-# 				self.file.write("Min Temp: "+ str(mintemp)+"\n")
-# 				self.file.write("Average Temp:"+ str(avgtemp)+"\n")
-# 				self.file.write("Location: "+"\n\n")
+				self.file.write("Time: "+ str(time.gmtime()[1])+"-"+str(time.gmtime()[2])+"-"+str(time.gmtime()[0])+"  "+str(time.gmtime()[3]-5)+":"+str(time.gmtime()[4])+":"+str(time.gmtime()[5])+"\n")
+				self.file.write("Max Temp: "+ str(maxtemp)+"\n")
+				self.file.write("Min Temp: "+ str(mintemp)+"\n")
+				self.file.write("Average Temp:"+ str(avgtemp)+"\n")
+				self.file.write("Location: "+"\n\n")
 				self._snapshot(heatmap)
 				
 				if not self.is_running:
+					self.file.close()
 					self.recording == False
 					cap.release()
 					self.videoOut.release()
