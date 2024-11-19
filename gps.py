@@ -10,7 +10,7 @@ import threading
 import os
 
 class GPS():
-    def __init__(self):
+    def __init__(self, lock):
         self.gpgga_info = "$GPGGA,"
         self.ser = serial.Serial ("/dev/ttyS0")              #Open port with baud rate
         self.GPGGA_buffer = 0
@@ -24,6 +24,8 @@ class GPS():
         file_path = 'data/' + time.strftime("%Y%m%d-%H%M") + '/' #change
         os.makedirs(file_path, exist_ok=True)
         self.file = open(file_path + 'gps_data.txt', 'a')
+
+        self.lock = lock
 
     def _GPS_Info(self):
         # global NMEA_buff
@@ -59,6 +61,7 @@ class GPS():
         return position
     
     def _collect_data(self):
+        global curr_gps
         while self.is_running:
             received_data = (str)(self.ser.readline())                   #read NMEA string received
             GPGGA_data_available = received_data.find(self.gpgga_info)   #check for NMEA GPGGA string                 
@@ -71,6 +74,9 @@ class GPS():
                 # time is off by three hours
                 #nmea_time_new=nmea_time-30000
                 print("Latitude: ", self.lat_in_degrees," Longitude: ", self.long_in_degrees, file = self.file)
+
+                with self.lock:
+                    curr_gps = f"Latitude: {self.lat_in_degrees}, Longitude: {self.long_in_degrees}"
         #webbrowser.open(map_link)        #open current position information in google map
         self.file.close()
         sys.exit(0)

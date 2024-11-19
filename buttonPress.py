@@ -4,6 +4,7 @@ from ultradistant import Ultrasonic
 from gps import GPS
 from thermal import ThermalCamera
 from camera import Camera
+import threading
 
 file = open('testing.txt','a')
 file.write("Hi")
@@ -18,10 +19,12 @@ previousSetting=False
 currSetting = False
 state = False
 
+shared_lock = threading.Lock()
+
 # initialize sensors
 us = Ultrasonic() # ultrasonic sensor
-gps = GPS() # GPS
-tc = ThermalCamera()
+gps = GPS(shared_lock) # GPS
+tc = ThermalCamera(shared_lock)
 cm = Camera()
 # sensors = [us, gps, tc]
 # sensors = [us]

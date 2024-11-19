@@ -18,7 +18,7 @@ import threading
 		
 #TODO: GET RID OF CODE WHERE IT DISPLAYS AND LAUNCHES WINDOW, JUST KEEP RECORDING
 class ThermalCamera():
-	def __init__(self):
+	def __init__(self, lock):
 # 		dev = 1 # removing argument "--device x" which allows to specify device, don't move the thermal camera location!
 		
 		#init video
@@ -54,6 +54,8 @@ class ThermalCamera():
 		self.file =open('data/' + time.strftime("%Y%m%d-%H%M")+".txt","a")
 		self.is_running = False
 		self.my_thread = None
+
+		self.lock = lock
         
 
 	def _snapshot(self, heatmap):
@@ -74,6 +76,11 @@ class ThermalCamera():
 		return self.snaptime
 	
 	def _collect_data(self):
+		global curr_gps
+
+		with self.lock:
+			gps = curr_gps
+
 		dev = 1 # removing argument "--device x" which allows to specify device, don't move the thermal camera location!
 		cap = cv2.VideoCapture('/dev/video'+str(dev), cv2.CAP_V4L)
 		cap.set(cv2.CAP_PROP_CONVERT_RGB, 0.0)
@@ -235,6 +242,10 @@ class ThermalCamera():
 					cv2.putText(heatmap,str(mintemp)+' C', ((lrow*self.scale)+10, (lcol*self.scale)+5),\
 					cv2.FONT_HERSHEY_SIMPLEX, 0.45,(0, 255, 255), 1, cv2.LINE_AA)
 
+				# display gps
+
+
+				
 				#display image
 				#cv2.imshow('Thermal',heatmap)
 
@@ -248,7 +259,7 @@ class ThermalCamera():
 				self.file.write("Max Temp: "+ str(maxtemp)+"\n")
 				self.file.write("Min Temp: "+ str(mintemp)+"\n")
 				self.file.write("Average Temp:"+ str(avgtemp)+"\n")
-				self.file.write("Location: "+"\n\n")
+				self.file.write("Location: "+ gps)
 				self._snapshot(heatmap)
 				
 				if not self.is_running:
