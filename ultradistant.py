@@ -16,7 +16,7 @@ import os
 # board numbering system to use
 
 class Ultrasonic():
-    def __init__(self):
+    def __init__(self, lock):
         # super().__init__()
         #GPIO.setmode(GPIO.BCM)
 #         GPIO.setmode(GPIO.BOARD)
@@ -43,8 +43,11 @@ class Ultrasonic():
         # runText = input('Enter Short Description of Run Parameters: ')
         # # print to file
         # print('n =', numReadings, runText, file = open('distances.txt', 'a'))
+        self.lock = lock
 
     def _collect_data(self):
+        global curr_dist
+        curr_dist = 0.0
         # start loop to measure distances
 #         print('in dist func')
 #         try:
@@ -86,6 +89,10 @@ class Ultrasonic():
             # print data to shell and to the file
             print(round(dist_cm, 3))
             print(round(dist_cm, 3), file = self.file)
+            
+            with self.lock:
+                curr_dist = dist_cm
+                
             # sleep to slow things down
             time.sleep(self.delayTime)
 #         finally:

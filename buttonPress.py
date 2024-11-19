@@ -19,12 +19,13 @@ previousSetting=False
 currSetting = False
 state = False
 
-shared_lock = threading.Lock()
+gps_lock = threading.Lock()
+us_lock = threading.lock()
 
 # initialize sensors
-us = Ultrasonic() # ultrasonic sensor
-gps = GPS(shared_lock) # GPS
-tc = ThermalCamera(shared_lock)
+us = Ultrasonic(us_lock) # ultrasonic sensor
+gps = GPS(gps_lock) # GPS
+tc = ThermalCamera(us_lock, gps_lock)
 cm = Camera()
 # sensors = [us, gps, tc]
 # sensors = [us]

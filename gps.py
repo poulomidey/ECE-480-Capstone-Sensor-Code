@@ -62,6 +62,8 @@ class GPS():
     
     def _collect_data(self):
         global curr_gps
+        curr_gps = '000'
+        
         while self.is_running:
             received_data = (str)(self.ser.readline())                   #read NMEA string received
             GPGGA_data_available = received_data.find(self.gpgga_info)   #check for NMEA GPGGA string                 

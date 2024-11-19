@@ -18,7 +18,7 @@ import threading
 		
 #TODO: GET RID OF CODE WHERE IT DISPLAYS AND LAUNCHES WINDOW, JUST KEEP RECORDING
 class ThermalCamera():
-	def __init__(self, lock):
+	def __init__(self, us_lock, gps_lock):
 # 		dev = 1 # removing argument "--device x" which allows to specify device, don't move the thermal camera location!
 		
 		#init video
@@ -55,7 +55,8 @@ class ThermalCamera():
 		self.is_running = False
 		self.my_thread = None
 
-		self.lock = lock
+		self.gps_lock = gps_lock
+		self.us_lock = us_lock
         
 
 	def _snapshot(self, heatmap):
@@ -76,10 +77,11 @@ class ThermalCamera():
 		return self.snaptime
 	
 	def _collect_data(self):
-		global curr_gps
+		global curr_gps 
+		curr_gps = '000'
 
-		with self.lock:
-			gps = curr_gps
+		global curr_dist
+		curr_dist = 0.0
 
 		dev = 1 # removing argument "--device x" which allows to specify device, don't move the thermal camera location!
 		cap = cv2.VideoCapture('/dev/video'+str(dev), cv2.CAP_V4L)
@@ -87,6 +89,10 @@ class ThermalCamera():
 # 		print(cap.isOpened())v
 # 		print(self.is_running)
 		while(self.is_running and cap.isOpened()):
+			with self.gps_lock:
+				gps = curr_gps
+			with self.us_lock:
+				dist = curr_dist
 			# Capture frame-by-frame
 			ret, frame = cap.read()
 			if ret == True:
@@ -205,10 +211,10 @@ class ThermalCamera():
 					cv2.putText(heatmap,'Colormap: '+cmapText, (10, 42),\
 					cv2.FONT_HERSHEY_SIMPLEX, 0.4,(0, 255, 255), 1, cv2.LINE_AA)
 
-					cv2.putText(heatmap,'Blur: '+str(self.rad)+' ', (10, 56),\
+					cv2.putText(heatmap,'GPS: '+ gps +' ', (10, 56),\
 					cv2.FONT_HERSHEY_SIMPLEX, 0.4,(0, 255, 255), 1, cv2.LINE_AA)
 
-					cv2.putText(heatmap,'Scaling: '+str(self.scale)+' ', (10, 70),\
+					cv2.putText(heatmap,'Distance: '+str(dist)+' ', (10, 70),\
 					cv2.FONT_HERSHEY_SIMPLEX, 0.4,(0, 255, 255), 1, cv2.LINE_AA)
 
 					cv2.putText(heatmap,'Contrast: '+str(self.alpha)+' ', (10, 84),\
@@ -224,6 +230,8 @@ class ThermalCamera():
 					if self.is_running == True:
 						cv2.putText(heatmap,'Recording: '+self.elapsed, (10, 112),\
 						cv2.FONT_HERSHEY_SIMPLEX, 0.4,(40, 40, 255), 1, cv2.LINE_AA)
+# 					cv2.putText(heatmap,'GPS: ' + gps, (10, 116), \
+# 					cv2.FONT_HERSHEY_SIMPLEX, 0.4,(0, 255, 255), 1, cv2.LINE_AA)
 				
 				if maxtemp > avgtemp+self.threshold:
 					cv2.circle(heatmap, (mrow*self.scale, mcol*self.scale), 5, (0,0,0), 2)
