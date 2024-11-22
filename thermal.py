@@ -19,7 +19,7 @@ import settings #global var file
 		
 #TODO: GET RID OF CODE WHERE IT DISPLAYS AND LAUNCHES WINDOW, JUST KEEP RECORDING
 class ThermalCamera():
-	def __init__(self, file_path, us_lock, gps_lock):
+	def __init__(self, us_lock, gps_lock):
 # 		dev = 1 # removing argument "--device x" which allows to specify device, don't move the thermal camera location!
 		
 		#init video
@@ -48,19 +48,23 @@ class ThermalCamera():
 		self.start = time.time()
 		self.now = time.strftime("%Y%m%d--%H%M%S")
 		
-		self.file_path = file_path
+		self.file_path = None
 # 		self.file_path = 'data/' + time.strftime("%Y%m%d-%H%M") + '/'
 # 		os.makedirs(self.file_path, exist_ok=True)
 
-		self.videoOut = cv2.VideoWriter(self.file_path+'thermal_video'+self.now+'output.avi', cv2.VideoWriter_fourcc(*'XVID'),25, (self.newWidth,self.newHeight))
+		self.videoOut = None
 		# creating a file to write temperature data to and timestamp, eventually gps data too....
-		self.file =open('data/' + time.strftime("%Y%m%d-%H%M")+".txt","a")
+		self.file = None
 		self.is_running = False
 		self.my_thread = None
 
 		self.gps_lock = gps_lock
 		self.us_lock = us_lock
         
+	def _create_file(self, file_path):
+		self.file_path = file_path
+		self.videoOut = cv2.VideoWriter(self.file_path+'thermal_video'+self.now+'output.avi', cv2.VideoWriter_fourcc(*'XVID'),25, (self.newWidth,self.newHeight))
+		self.file = open('data/' + time.strftime("%Y%m%d-%H%M")+".txt","a")
 
 	def _snapshot(self, heatmap):
 		self.now = time.strftime("%Y%m%d-%H%M%S") 
@@ -80,10 +84,6 @@ class ThermalCamera():
 		return self.snaptime
 	
 	def _collect_data(self):
-		global curr_gps 
-		curr_gps = '000'
-		
-
 		dev = 1 # removing argument "--device x" which allows to specify device, don't move the thermal camera location!
 		cap = cv2.VideoCapture('/dev/video'+str(dev), cv2.CAP_V4L)
 		cap.set(cv2.CAP_PROP_CONVERT_RGB, 0.0)
@@ -92,7 +92,7 @@ class ThermalCamera():
 		while(self.is_running and cap.isOpened()):
 			# with self.gps_lock:
 			self.gps_lock.acquire()
-			gps = curr_gps
+			gps = settings.curr_gps
 			self.gps_lock.release()
 
 			# with self.us_lock:

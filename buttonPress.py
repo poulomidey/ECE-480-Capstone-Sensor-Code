@@ -24,9 +24,9 @@ us_lock = threading.Lock()
 
 # initialize sensors
 us = Ultrasonic(us_lock) # ultrasonic sensor
-# gps = GPS(file_path, gps_lock) # GPS
-# tc = ThermalCamera(file_path, us_lock, gps_lock)
-# cm = Camera(file_path)
+# gps = GPS(gps_lock) # GPS
+tc = ThermalCamera(us_lock, gps_lock)
+cm = Camera()
 # sensors = [us, gps, tc]
 # sensors = [us]
 
@@ -51,15 +51,20 @@ while True:
                 print(file_path)
                 os.makedirs(file_path, exist_ok=True)
                 
+                # create individual file paths for each sensor
                 us._create_file(file_path)
+                # gps._create_file(file_path)
+                tc._create_file(file_path)
+                cm._create_file(file_path)
                 
                 
                 # call sensors
                 us.start_data_collection()
 #                 cm.start_data_collection()
 #                 tc.start_data_collection()
-                print('start')
 #                 gps.start_data_collection()
+                print('start')
+
 #                 for sensor in sensors:
 #                     sensor.start_data_collection()
             else:
@@ -72,8 +77,6 @@ while True:
 #                     sensor.stop_data_collection()
                 print('stop')
 
-            # TODO: Make it so each button press creates a new subfolder within the data folder (ideally timestamped),
-            # which will hold all the data from all the sensors for that button press
 
     GPIO.setmode(GPIO.BOARD)
     GPIO.setup(12, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)        

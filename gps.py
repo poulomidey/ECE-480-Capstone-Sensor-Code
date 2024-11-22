@@ -8,9 +8,10 @@ import sys                  #import system package
 import threading
 # from sensor import Sensor
 import os
+import settings #global var file
 
 class GPS():
-    def __init__(self, file_path, lock):
+    def __init__(self, lock):
         self.gpgga_info = "$GPGGA,"
         self.ser = serial.Serial ("/dev/ttyS0")              #Open port with baud rate
         self.GPGGA_buffer = 0
@@ -23,9 +24,12 @@ class GPS():
         # self.file = open('data/locations1108.txt', 'a')
 #         file_path = 'data/' + time.strftime("%Y%m%d-%H%M") + '/' #change
 #         os.makedirs(file_path, exist_ok=True)
-        self.file = open(file_path + 'gps_data.txt', 'a')
+        self.file = None
 
         self.lock = lock
+
+    def _create_file(self, file_path):
+        self.file = open(file_path + 'gps_data.txt', 'a')
 
     def _GPS_Info(self):
         # global NMEA_buff
@@ -60,10 +64,7 @@ class GPS():
         position = "%.4f" %(position)
         return position
     
-    def _collect_data(self):
-        global curr_gps
-        curr_gps = '000'
-        
+    def _collect_data(self):       
         while self.is_running:
             received_data = (str)(self.ser.readline())                   #read NMEA string received
             GPGGA_data_available = received_data.find(self.gpgga_info)   #check for NMEA GPGGA string                 
@@ -79,7 +80,7 @@ class GPS():
 
                 # with self.lock:
                 self.lock.acquire()
-                curr_gps = f"Latitude: {self.lat_in_degrees}, Longitude: {self.long_in_degrees}"
+                settings.curr_gps = f"Latitude: {self.lat_in_degrees}, Longitude: {self.long_in_degrees}"
                 time.sleep(.5)
                 self.lock.release()
 
