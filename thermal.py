@@ -98,7 +98,7 @@ class ThermalCamera():
 			# with self.us_lock:
 			self.us_lock.acquire()
 			dist = settings.curr_dist
-			print(f'tc: {dist}')
+			# print(f'tc: {dist}')
 			self.us_lock.release()
 			# Capture frame-by-frame
 			ret, frame = cap.read()
