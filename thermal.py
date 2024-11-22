@@ -14,11 +14,12 @@ import os.path # included to save photos to a different folder for each hour
 # from sensor import Sensor
 import os
 import threading
+import settings #global var file
 
 		
 #TODO: GET RID OF CODE WHERE IT DISPLAYS AND LAUNCHES WINDOW, JUST KEEP RECORDING
 class ThermalCamera():
-	def __init__(self, us_lock, gps_lock):
+	def __init__(self, file_path, us_lock, gps_lock):
 # 		dev = 1 # removing argument "--device x" which allows to specify device, don't move the thermal camera location!
 		
 		#init video
@@ -47,8 +48,10 @@ class ThermalCamera():
 		self.start = time.time()
 		self.now = time.strftime("%Y%m%d--%H%M%S")
 		
-		self.file_path = 'data/' + time.strftime("%Y%m%d-%H%M") + '/'
-		os.makedirs(self.file_path, exist_ok=True)
+		self.file_path = file_path
+# 		self.file_path = 'data/' + time.strftime("%Y%m%d-%H%M") + '/'
+# 		os.makedirs(self.file_path, exist_ok=True)
+
 		self.videoOut = cv2.VideoWriter(self.file_path+'thermal_video'+self.now+'output.avi', cv2.VideoWriter_fourcc(*'XVID'),25, (self.newWidth,self.newHeight))
 		# creating a file to write temperature data to and timestamp, eventually gps data too....
 		self.file =open('data/' + time.strftime("%Y%m%d-%H%M")+".txt","a")
@@ -79,9 +82,7 @@ class ThermalCamera():
 	def _collect_data(self):
 		global curr_gps 
 		curr_gps = '000'
-
-		global curr_dist
-		curr_dist = 0.0
+		
 
 		dev = 1 # removing argument "--device x" which allows to specify device, don't move the thermal camera location!
 		cap = cv2.VideoCapture('/dev/video'+str(dev), cv2.CAP_V4L)
@@ -96,7 +97,8 @@ class ThermalCamera():
 
 			# with self.us_lock:
 			self.us_lock.acquire()
-			dist = curr_dist
+			dist = settings.curr_dist
+			print(f'tc: {dist}')
 			self.us_lock.release()
 			# Capture frame-by-frame
 			ret, frame = cap.read()
@@ -219,7 +221,7 @@ class ThermalCamera():
 					cv2.putText(heatmap,'GPS: '+ gps +' ', (10, 56),\
 					cv2.FONT_HERSHEY_SIMPLEX, 0.4,(0, 255, 255), 1, cv2.LINE_AA)
 
-					cv2.putText(heatmap,'Distance: '+str(dist)+' ', (10, 70),\
+					cv2.putText(heatmap,'Distance: '+str(round(dist,3))+' ', (10, 70),\
 					cv2.FONT_HERSHEY_SIMPLEX, 0.4,(0, 255, 255), 1, cv2.LINE_AA)
 
 					cv2.putText(heatmap,'Contrast: '+str(self.alpha)+' ', (10, 84),\

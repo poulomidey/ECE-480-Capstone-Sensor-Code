@@ -6,7 +6,7 @@ import time
 import RPi.GPIO as GPIO
 
 class Camera():
-    def __init__(self):
+    def __init__(self, file_path):
         self.camera = picamera.PiCamera()
         self.camera.resolution = (640, 480)
 
@@ -14,8 +14,8 @@ class Camera():
         self.my_thread = None
         
         # self.file = 'data/camera.h264'
-        file_path = 'data/' + time.strftime("%Y%m%d-%H%M") + '/'
-        os.makedirs(file_path, exist_ok=True)
+#         file_path = 'data/' + time.strftime("%Y%m%d-%H%M") + '/'
+#         os.makedirs(file_path, exist_ok=True)
         file_path += 'camera_data.h264'
         self.file = file_path
         # self.file = open(self.file, 'a')

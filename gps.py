@@ -10,7 +10,7 @@ import threading
 import os
 
 class GPS():
-    def __init__(self, lock):
+    def __init__(self, file_path, lock):
         self.gpgga_info = "$GPGGA,"
         self.ser = serial.Serial ("/dev/ttyS0")              #Open port with baud rate
         self.GPGGA_buffer = 0
@@ -21,8 +21,8 @@ class GPS():
         self.is_running = False
         self.my_thread = None
         # self.file = open('data/locations1108.txt', 'a')
-        file_path = 'data/' + time.strftime("%Y%m%d-%H%M") + '/' #change
-        os.makedirs(file_path, exist_ok=True)
+#         file_path = 'data/' + time.strftime("%Y%m%d-%H%M") + '/' #change
+#         os.makedirs(file_path, exist_ok=True)
         self.file = open(file_path + 'gps_data.txt', 'a')
 
         self.lock = lock

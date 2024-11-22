@@ -12,6 +12,7 @@ import RPi.GPIO as GPIO
 import time
 import threading
 import os
+import settings #global var file
 # from sensor import Sensor
 # board numbering system to use
 
@@ -32,11 +33,13 @@ class Ultrasonic():
 
         self.is_running = False
         self.my_thread = None
-        # self.file = open('data/ultrasonic_distance.txt', 'a')
-        file_path = 'data/' + time.strftime("%Y%m%d-%H%M") + '/' #change
-        print(file_path)
-        os.makedirs(file_path, exist_ok=True)
-        self.file = open(file_path + 'ultrasonic_distance.txt', 'a')
+
+#         file_path = 'data/' + time.strftime("%Y%m%d-%H%M") + '/' #change
+#         print(file_path)
+#         os.makedirs(file_path, exist_ok=True)
+
+#         
+        self.file = None
 
         # # ask user for number of replicate distances and short description of run
         # numReadings = int(input('Enter number of distance readings desired: '))
@@ -44,10 +47,12 @@ class Ultrasonic():
         # # print to file
         # print('n =', numReadings, runText, file = open('distances.txt', 'a'))
         self.lock = lock
+    
+    def _create_file(self, file_path):
+        self.file = open(file_path + 'ultrasonic_distance.txt', 'a')
 
     def _collect_data(self):
-        global curr_dist
-        curr_dist = 0.0
+
         # start loop to measure distances
 #         print('in dist func')
 #         try:
@@ -92,7 +97,9 @@ class Ultrasonic():
             
             # with self.lock:
             self.lock.acquire()
-            curr_dist = dist_cm
+            settings.curr_dist = dist_cm
+            print(f'us: {settings.curr_dist}')
+#             time.sleep(.5)
             self.lock.release()
                 
             # sleep to slow things down
