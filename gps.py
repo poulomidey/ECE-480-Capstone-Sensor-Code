@@ -77,8 +77,12 @@ class GPS():
                 #nmea_time_new=nmea_time-30000
                 print("Latitude: ", self.lat_in_degrees," Longitude: ", self.long_in_degrees, file = self.file)
 
-                with self.lock:
-                    curr_gps = f"Latitude: {self.lat_in_degrees}, Longitude: {self.long_in_degrees}"
+                # with self.lock:
+                self.lock.acquire()
+                curr_gps = f"Latitude: {self.lat_in_degrees}, Longitude: {self.long_in_degrees}"
+                time.sleep(.5)
+                self.lock.release()
+
         #webbrowser.open(map_link)        #open current position information in google map
         self.file.close()
         sys.exit(0)

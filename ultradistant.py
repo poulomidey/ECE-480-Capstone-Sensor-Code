@@ -90,8 +90,10 @@ class Ultrasonic():
             print(round(dist_cm, 3))
             print(round(dist_cm, 3), file = self.file)
             
-            with self.lock:
-                curr_dist = dist_cm
+            # with self.lock:
+            self.lock.acquire()
+            curr_dist = dist_cm
+            self.lock.release()
                 
             # sleep to slow things down
             time.sleep(self.delayTime)

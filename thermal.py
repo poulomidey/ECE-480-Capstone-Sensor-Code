@@ -89,10 +89,15 @@ class ThermalCamera():
 # 		print(cap.isOpened())v
 # 		print(self.is_running)
 		while(self.is_running and cap.isOpened()):
-			with self.gps_lock:
-				gps = curr_gps
-			with self.us_lock:
-				dist = curr_dist
+			# with self.gps_lock:
+			self.gps_lock.acquire()
+			gps = curr_gps
+			self.gps_lock.release()
+
+			# with self.us_lock:
+			self.us_lock.acquire()
+			dist = curr_dist
+			self.us_lock.release()
 			# Capture frame-by-frame
 			ret, frame = cap.read()
 			if ret == True:
