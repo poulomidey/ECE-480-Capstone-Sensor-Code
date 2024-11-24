@@ -15,3 +15,5 @@ Topdon. (n.d.). Topdon downloads. HK Topdon Technology Co., LIMITED. https://www
 https://docs.arducam.com/Raspberry-Pi-Camera/Native-camera/PiCamera2-User-Guide/
 
 https://github.com/raspberrypi/picamera2/tree/main/examples
+
+https://www.hackster.io/exp0nge/mapping-road-conditions-758370
