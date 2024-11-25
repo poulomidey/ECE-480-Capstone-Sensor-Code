@@ -7,6 +7,7 @@ from camera import Camera
 import threading
 import settings #global var file
 import os
+from mfl import MFL
 
 
 #button setup
@@ -27,6 +28,7 @@ us = Ultrasonic(us_lock) # ultrasonic sensor
 # gps = GPS(gps_lock) # GPS
 tc = ThermalCamera(us_lock, gps_lock)
 cm = Camera()
+mfl = MFL()
 # sensors = [us, gps, tc]
 # sensors = [us]
 
@@ -56,13 +58,15 @@ while True:
                 # gps._create_file(file_path)
                 tc._create_file(file_path)
                 cm._create_file(file_path)
+                mfl._create_file(file_path)
                 
                 
                 # call sensors
                 us.start_data_collection()
-#                 cm.start_data_collection()
-#                 tc.start_data_collection()
-#                 gps.start_data_collection()
+                cm.start_data_collection()
+                tc.start_data_collection()
+                # gps.start_data_collection()
+                mfl.start_data_collection()
                 print('start')
 
 #                 for sensor in sensors:
@@ -70,9 +74,10 @@ while True:
             else:
                 # stop sensors
                 us.stop_data_collection()
-#                 cm.stop_data_collection()
-#                 tc.stop_data_collection() #change
+                cm.stop_data_collection()
+                tc.stop_data_collection() #change
 #                 gps.stop_data_collection()
+                mfl.stop_data_collection() 
 #                 for sensor in sensors:
 #                     sensor.stop_data_collection()
                 print('stop')
